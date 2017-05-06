@@ -12,7 +12,7 @@ before_install:
   - gem install asciidoctor
 install:
   - make setup
-  - make build-linux
+  - make build
 script:
   - make test
 after_script:
