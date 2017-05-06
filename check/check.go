@@ -221,7 +221,7 @@ func checkScript(txt string, chkDef Script, exe string, f *core.File) []core.Ale
 
 func checkSpelling(txt string, chk Spelling, gs *gospell.GoSpell, f *core.File) []core.Alert {
 	alerts := []core.Alert{}
-	for _, w := range gs.Split(txt) {
+	for _, w := range core.WordTokenizer.Tokenize(txt) {
 		if !core.StringInSlice(w, chk.Ignore) {
 			if known := gs.Spell(w); !known {
 				offset := strings.Index(txt, w)

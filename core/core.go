@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/gobwas/glob"
+	"github.com/jdkato/prose/tokenize"
 
 	"gopkg.in/neurosnap/sentences.v1/english"
 )
@@ -227,3 +228,6 @@ func (f *File) ResetComments() {
 
 // SentenceTokenizer splits text into sentences.
 var SentenceTokenizer, _ = english.NewSentenceTokenizer(nil)
+
+// WordTokenizer splits text into words.
+var WordTokenizer = tokenize.NewRegexpTokenizer(`[\p{N}\p{L}']+`, false, true)
