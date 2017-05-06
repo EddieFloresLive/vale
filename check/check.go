@@ -262,8 +262,6 @@ func addCapitalizationCheck(chkName string, chkDef Capitalization) {
 }
 
 func addSpellingCheck(chkName string, chkDef Spelling) {
-	chkDef.Aff, _ = filepath.Abs(chkDef.Aff)
-	chkDef.Dic, _ = filepath.Abs(chkDef.Dic)
 	model, err := gospell.NewGoSpell(chkDef.Aff, chkDef.Dic)
 	fn := func(text string, file *core.File) []core.Alert {
 		return checkSpelling(text, chkDef, model, file)
