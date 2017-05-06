@@ -1,12 +1,13 @@
 {
-    "memo": "a4e2cf3fe5babfdc30009d3136c7a5cd4966ffce4920ecb0b3c637dfa2af453b",
+    "memo": "3304d20e107291298e300cbb83c28a2c063f0c681f14dc9387730a3e53da16a9",
     "projects": [
         {
-            "name": "github.com/client9/misspell",
+            "name": "github.com/client9/gospell",
             "branch": "master",
-            "revision": "d06ddd376b273047dca6e16eeeb2a2a8f9791978",
+            "revision": "90dfc71015dfebd3a7274f1ad2756c1dbf09e250",
             "packages": [
-                "."
+                ".",
+                "plaintext"
             ]
         },
         {

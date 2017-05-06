@@ -11,7 +11,7 @@ import (
 
 	"github.com/ValeLint/vale/core"
 	"github.com/ValeLint/vale/rule"
-	"github.com/client9/misspell"
+	"github.com/client9/gospell"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 	"matloob.io/regexp"
@@ -219,21 +219,21 @@ func checkScript(txt string, chkDef Script, exe string, f *core.File) []core.Ale
 	return alerts
 }
 
-func checkSpelling(txt string, chk Spelling, r *misspell.Replacer, f *core.File) []core.Alert {
+func checkSpelling(txt string, chk Spelling, gs *gospell.GoSpell, f *core.File) []core.Alert {
 	alerts := []core.Alert{}
-
-	_, changes := r.Replace(txt)
-	for _, diff := range changes {
-		offset := strings.Index(txt, diff.FullLine)
-		start := offset + diff.Column
-		loc := []int{start, start + len(diff.Original)}
-		a := core.Alert{Check: chk.Name, Severity: chk.Level, Span: loc,
-			Link: chk.Link}
-		a.Message, a.Description = formatMessages(chk.Message,
-			chk.Description, diff.Corrected, diff.Original)
-		alerts = append(alerts, a)
+	for _, w := range gs.Split(txt) {
+		if !core.StringInSlice(w, chk.Ignore) {
+			if known := gs.Spell(w); !known {
+				offset := strings.Index(txt, w)
+				loc := []int{offset, offset + len(w)}
+				a := core.Alert{Check: chk.Name, Severity: chk.Level, Span: loc,
+					Link: chk.Link}
+				a.Message, a.Description = formatMessages(chk.Message,
+					chk.Description, w)
+				alerts = append(alerts, a)
+			}
+		}
 	}
-
 	return alerts
 }
 
@@ -262,33 +262,15 @@ func addCapitalizationCheck(chkName string, chkDef Capitalization) {
 }
 
 func addSpellingCheck(chkName string, chkDef Spelling) {
-	r := misspell.Replacer{
-		Replacements: misspell.DictMain,
-		Debug:        false,
-	}
-
-	switch strings.ToUpper(chkDef.Locale) {
-	case "":
-		// nothing
-	case "US":
-		r.AddRuleList(misspell.DictAmerican)
-	case "UK", "GB":
-		r.AddRuleList(misspell.DictBritish)
-	}
-
-	if len(chkDef.Ignore) > 0 {
-		r.RemoveRule(chkDef.Ignore)
-	}
-
-	if len(chkDef.Add) > 0 {
-		r.AddRuleList(chkDef.Add)
-	}
-
-	r.Compile()
+	chkDef.Aff, _ = filepath.Abs(chkDef.Aff)
+	chkDef.Dic, _ = filepath.Abs(chkDef.Dic)
+	model, err := gospell.NewGoSpell(chkDef.Aff, chkDef.Dic)
 	fn := func(text string, file *core.File) []core.Alert {
-		return checkSpelling(text, chkDef, &r, file)
+		return checkSpelling(text, chkDef, model, file)
 	}
-	updateAllChecks(chkDef.Definition, fn)
+	if core.CheckError(err) {
+		updateAllChecks(chkDef.Definition, fn)
+	}
 }
 
 func addScriptCheck(chkName string, chkDef Script) {

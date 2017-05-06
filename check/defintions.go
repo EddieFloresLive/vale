@@ -81,12 +81,12 @@ type Script struct {
 	Runtime    string
 }
 
-// Spelling spell checks English text according to a locale.
+// Spelling checks text against a Hunspell dictionary.
 type Spelling struct {
 	Definition `mapstructure:",squash"`
-	Locale     string
+	Aff        string
+	Dic        string
 	Ignore     []string
-	Add        []string
 }
 
 // Capitalization checks the case of a string.
