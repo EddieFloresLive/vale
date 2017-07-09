@@ -153,6 +153,7 @@ func (l Linter) lintScope(f *core.File, ctx, txt, raw string, tags []string, lin
 			return
 		}
 	}
+	f.Summary.WriteString(raw)
 	l.lintProse(f, ctx, txt, raw, lines, 0)
 }
 
